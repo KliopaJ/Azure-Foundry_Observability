@@ -1,0 +1,35 @@
+# ── Environment files (contain secrets) ──────────────────────────────────────
+.env
+.env.apim
+usage-simulation/.env
+clients/.env
+
+# ── Simulation output (generated markdown reports) ───────────────────────────
+usage-simulation/single-simulation/*--reply-*.md
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# ── Node / Frontend ─────────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+
+# ── Build output (generated from frontend) ───────────────────────────────────
+backend/static/
+
+# ── OS junk ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Azure icon build artifacts (regenerated via generate_architecture.py) ────
+assets/icons/*.png

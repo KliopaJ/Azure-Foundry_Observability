@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --chart-grid: #e5e7eb;
+    --chart-text: #374151;
+    --tooltip-bg: rgba(255, 255, 255, 0.85);
+    --tooltip-text: #1f2937;
+    --tooltip-border: rgba(209, 213, 219, 0.6);
+  }
+  .dark {
+    --chart-grid: #374151;
+    --chart-text: #d1d5db;
+    --tooltip-bg: rgba(17, 24, 39, 0.85);
+    --tooltip-text: #f3f4f6;
+    --tooltip-border: rgba(55, 65, 81, 0.6);
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .recharts-cartesian-axis-tick text,
+  .recharts-label {
+    fill: var(--chart-text);
+  }
+}

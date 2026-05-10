@@ -1,0 +1,456 @@
+<mxfile host="app.diagrams.net" modified="2026-05-10T00:00:00.000Z" agent="draw.io 21.0.0" version="21.0.0" type="device">
+  <diagram name="Foundry Observability Architecture" id="foundry-obs-arch">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ================================================================ -->
+        <!-- TITLE                                                              -->
+        <!-- ================================================================ -->
+        <mxCell id="title" value="Foundry Observability — Solution Architecture"
+          style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;
+                 whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#002050;"
+          vertex="1" parent="1">
+          <mxGeometry x="460" y="20" width="1000" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- ZONE BACKGROUNDS                                                  -->
+        <!-- ================================================================ -->
+
+        <!-- Zone: Client Tier -->
+        <mxCell id="z-clients" value="Client Tier"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF3FB;strokeColor=#0078D4;
+                 strokeWidth=2;dashed=1;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#0078D4;arcSize=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="30" y="90" width="380" height="410" as="geometry" />
+        </mxCell>
+
+        <!-- Zone: Application Tier -->
+        <mxCell id="z-app" value="Application Tier  (Docker + uvicorn)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FF;strokeColor=#0078D4;
+                 strokeWidth=2;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#0078D4;arcSize=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="250" height="410" as="geometry" />
+        </mxCell>
+
+        <!-- Zone: Azure VNet -->
+        <mxCell id="z-vnet" value="Azure Virtual Network  (10.0.0.0/16)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F7F5;strokeColor=#008272;
+                 strokeWidth=2;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#008272;arcSize=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="780" y="90" width="460" height="410" as="geometry" />
+        </mxCell>
+
+        <!-- Zone: Observability -->
+        <mxCell id="z-obs" value="Observability"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#107C10;
+                 strokeWidth=2;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#107C10;arcSize=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="1300" y="90" width="560" height="410" as="geometry" />
+        </mxCell>
+
+        <!-- Zone: AI Services -->
+        <mxCell id="z-ai" value="Azure AI Services"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF8C00;
+                 strokeWidth=2;verticalAlign=top;fontSize=13;fontStyle=1;fontColor=#FF8C00;arcSize=4;"
+          vertex="1" parent="1">
+          <mxGeometry x="780" y="560" width="460" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- SUB-ZONES inside VNet                                             -->
+        <!-- ================================================================ -->
+
+        <!-- snet-apim -->
+        <mxCell id="z-snet-apim" value="snet-apim  (10.0.1.0/24)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#008272;
+                 strokeWidth=1;dashed=1;verticalAlign=top;fontSize=10;fontStyle=0;fontColor=#737373;"
+          vertex="1" parent="1">
+          <mxGeometry x="800" y="130" width="420" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- snet-private-endpoints -->
+        <mxCell id="z-snet-pe" value="snet-private-endpoints  (10.0.2.0/24)"
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#008272;
+                 strokeWidth=1;dashed=1;verticalAlign=top;fontSize=10;fontStyle=0;fontColor=#737373;"
+          vertex="1" parent="1">
+          <mxGeometry x="800" y="320" width="420" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- CLIENT TIER SHAPES                                                -->
+        <!-- ================================================================ -->
+
+        <!-- Microsoft Entra ID -->
+        <mxCell id="s-entra" value="&lt;b&gt;Microsoft Entra ID&lt;/b&gt;&lt;br/&gt;OAuth2 PKCE&lt;br/&gt;App Registration"
+          style="shape=mxgraph.azure2.azure_active_directory;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#0078D4;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="140" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Admin / Developer User -->
+        <mxCell id="s-user" value="&lt;b&gt;Admin / Dev&lt;/b&gt;&lt;br/&gt;Browser"
+          style="shape=mxgraph.azure2.user;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#0078D4;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="280" y="140" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- React SPA -->
+        <mxCell id="s-spa" value="&lt;b&gt;React SPA&lt;/b&gt;&lt;br/&gt;MSAL.js Auth&lt;br/&gt;Recharts · Tailwind"
+          style="shape=mxgraph.azure2.app_service;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#0078D4;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="180" y="290" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- AI Client Scripts -->
+        <mxCell id="s-clients" value="&lt;b&gt;AI Client Scripts&lt;/b&gt;&lt;br/&gt;usage-simulation&lt;br/&gt;call_apim · call_kimi"
+          style="shape=mxgraph.azure2.developer_tools;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#FF8C00;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="80" y="400" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- APPLICATION TIER SHAPES                                           -->
+        <!-- ================================================================ -->
+
+        <!-- FastAPI Backend -->
+        <mxCell id="s-backend" value="&lt;b&gt;FastAPI Backend&lt;/b&gt;&lt;br/&gt;/api/metrics · /api/deployments&lt;br/&gt;/api/policy · /api/pricing&lt;br/&gt;/api/subscriptions · /api/quotas"
+          style="shape=mxgraph.azure2.container_instances;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#107C10;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="560" y="200" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- VNET / GATEWAY SHAPES                                             -->
+        <!-- ================================================================ -->
+
+        <!-- APIM (inside snet-apim) -->
+        <mxCell id="s-apim" value="&lt;b&gt;Azure API Management&lt;/b&gt;&lt;br/&gt;External VNet · Rate limits&lt;br/&gt;Per-user subscription keys&lt;br/&gt;TPM quota · Policy XML"
+          style="shape=mxgraph.azure2.api_management;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#5C2D91;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="860" y="170" width="68" height="68" as="geometry" />
+        </mxCell>
+
+        <!-- NSG (inside snet-apim) -->
+        <mxCell id="s-nsg" value="&lt;b&gt;NSG&lt;/b&gt;&lt;br/&gt;443 · 3443 · 6390"
+          style="shape=mxgraph.azure2.network_security_groups;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#E81123;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1100" y="180" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Private Endpoint (inside snet-pe) -->
+        <mxCell id="s-pe" value="&lt;b&gt;Private Endpoint&lt;/b&gt;&lt;br/&gt;NIC in snet-pe"
+          style="shape=mxgraph.azure2.private_endpoint;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#008272;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="870" y="360" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Private DNS Zone (inside snet-pe) -->
+        <mxCell id="s-dns" value="&lt;b&gt;Private DNS Zone&lt;/b&gt;&lt;br/&gt;privatelink.openai.azure.com"
+          style="shape=mxgraph.azure2.dns_zones;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#008272;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1100" y="360" width="50" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- OBSERVABILITY SHAPES                                              -->
+        <!-- ================================================================ -->
+
+        <!-- Application Insights -->
+        <mxCell id="s-appinsights" value="&lt;b&gt;Application Insights&lt;/b&gt;&lt;br/&gt;100% sampling&lt;br/&gt;W3C correlation"
+          style="shape=mxgraph.azure2.application_insights;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#5C2D91;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1350" y="150" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Log Analytics Workspace -->
+        <mxCell id="s-law" value="&lt;b&gt;Log Analytics Workspace&lt;/b&gt;&lt;br/&gt;PerGB2018 · 30-day retention&lt;br/&gt;KQL queries (AppMetrics)"
+          style="shape=mxgraph.azure2.log_analytics_workspaces;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#0078D4;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1560" y="150" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Azure Monitor -->
+        <mxCell id="s-monitor" value="&lt;b&gt;Azure Monitor&lt;/b&gt;&lt;br/&gt;InputTokens · OutputTokens&lt;br/&gt;TotalTokens · ModelRequests"
+          style="shape=mxgraph.azure2.azure_monitor;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#107C10;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1350" y="340" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Resource Graph -->
+        <mxCell id="s-resgraph" value="&lt;b&gt;Azure Resource Graph&lt;/b&gt;&lt;br/&gt;Cross-subscription&lt;br/&gt;resource discovery"
+          style="shape=mxgraph.azure2.resource_graph_explorer;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#0078D4;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1560" y="340" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- AI SERVICES SHAPES                                                -->
+        <!-- ================================================================ -->
+
+        <!-- Azure AI Foundry -->
+        <mxCell id="s-foundry" value="&lt;b&gt;Azure AI Foundry&lt;/b&gt;&lt;br/&gt;CognitiveServices / AIServices"
+          style="shape=mxgraph.azure2.azure_openai;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#FF8C00;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="860" y="610" width="70" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Model Deployments -->
+        <mxCell id="s-models" value="&lt;b&gt;Model Deployments&lt;/b&gt;&lt;br/&gt;GPT-4.1 · GPT-5 · DeepSeek&lt;br/&gt;Kimi · Llama · Phi · MAI"
+          style="shape=mxgraph.azure2.cognitive_services;sketch=0;html=1;pointerEvents=1;
+                 dashed=0;fillColor=#FF8C00;strokeColor=none;
+                 verticalLabelPosition=bottom;verticalAlign=top;align=center;
+                 outlineConnect=0;fontSize=10;"
+          vertex="1" parent="1">
+          <mxGeometry x="1100" y="620" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- CONNECTIONS / EDGES                                               -->
+        <!-- ================================================================ -->
+
+        <!-- Auth flow: User ↔ Entra ID -->
+        <mxCell id="e-user-entra" value="OAuth2 PKCE"
+          style="endArrow=block;endFill=1;startArrow=block;startFill=1;
+                 edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;strokeColor=#5C2D91;strokeWidth=2;"
+          edge="1" source="s-user" target="s-entra" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Entra ID → React SPA (JWT) -->
+        <mxCell id="e-entra-spa" value="JWT Token"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#5C2D91;strokeWidth=2;"
+          edge="1" source="s-entra" target="s-spa" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- User → React SPA -->
+        <mxCell id="e-user-spa" value="HTTPS"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#0078D4;"
+          edge="1" source="s-user" target="s-spa" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- React SPA → FastAPI (Bearer token) -->
+        <mxCell id="e-spa-backend" value="Bearer Token"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#0078D4;strokeWidth=2;"
+          edge="1" source="s-spa" target="s-backend" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → APIM (ARM policy management) -->
+        <mxCell id="e-backend-apim" value="ARM REST&lt;br/&gt;(Policy Mgmt)"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#5C2D91;"
+          edge="1" source="s-backend" target="s-apim" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- AI Clients → APIM (subscription key) -->
+        <mxCell id="e-clients-apim" value="APIM Key + Chat API"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#FF8C00;strokeWidth=2;"
+          edge="1" source="s-clients" target="s-apim" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- APIM → Private Endpoint (Private Link) -->
+        <mxCell id="e-apim-pe" value="Private Link"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#008272;strokeWidth=2;"
+          edge="1" source="s-apim" target="s-pe" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Private Endpoint → Foundry -->
+        <mxCell id="e-pe-foundry" value="Private Endpoint"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#008272;strokeWidth=2;"
+          edge="1" source="s-pe" target="s-foundry" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- DNS Zone → Private Endpoint -->
+        <mxCell id="e-dns-pe" value="DNS resolution"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#008272;"
+          edge="1" source="s-dns" target="s-pe" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- APIM → NSG -->
+        <mxCell id="e-apim-nsg"
+          style="endArrow=none;edgeStyle=orthogonalEdgeStyle;
+                 html=1;dashed=1;strokeColor=#E81123;"
+          edge="1" source="s-apim" target="s-nsg" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- APIM → App Insights (diagnostics) -->
+        <mxCell id="e-apim-appinsights" value="Diagnostics&lt;br/&gt;100% sampling"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;strokeColor=#5C2D91;strokeWidth=2;"
+          edge="1" source="s-apim" target="s-appinsights" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- App Insights → Log Analytics -->
+        <mxCell id="e-appinsights-law" value="Telemetry Store"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#0078D4;"
+          edge="1" source="s-appinsights" target="s-law" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → Monitor (metrics query) -->
+        <mxCell id="e-backend-monitor" value="Metrics Query"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#107C10;"
+          edge="1" source="s-backend" target="s-monitor" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → Log Analytics (KQL) -->
+        <mxCell id="e-backend-law" value="KQL Queries"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#0078D4;"
+          edge="1" source="s-backend" target="s-law" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FastAPI → Resource Graph (discovery) -->
+        <mxCell id="e-backend-resgraph" value="Discovery"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#0078D4;"
+          edge="1" source="s-backend" target="s-resgraph" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Foundry → Models -->
+        <mxCell id="e-foundry-models"
+          style="endArrow=none;edgeStyle=orthogonalEdgeStyle;
+                 html=1;strokeColor=#FF8C00;strokeWidth=2;"
+          edge="1" source="s-foundry" target="s-models" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Foundry → Monitor (token metrics) -->
+        <mxCell id="e-foundry-monitor" value="Token Metrics"
+          style="endArrow=block;endFill=1;edgeStyle=orthogonalEdgeStyle;
+                 html=1;fontSize=9;dashed=1;strokeColor=#107C10;"
+          edge="1" source="s-foundry" target="s-monitor" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ================================================================ -->
+        <!-- LEGEND                                                             -->
+        <!-- ================================================================ -->
+        <mxCell id="legend-box" value=""
+          style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#CCCCCC;strokeWidth=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1300" y="570" width="260" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;"
+          style="text;html=1;strokeColor=none;fillColor=none;align=left;
+                 verticalAlign=middle;fontSize=12;fontStyle=1;"
+          vertex="1" parent="1">
+          <mxGeometry x="1320" y="580" width="80" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-auth" value="Authentication flow"
+          style="endArrow=block;endFill=1;html=1;fontSize=9;strokeColor=#5C2D91;strokeWidth=2;"
+          edge="1" parent="1">
+          <mxGeometry x="1320" y="610" width="100" as="geometry">
+            <mxPoint x="1320" y="615" as="sourcePoint" />
+            <mxPoint x="1420" y="615" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend-data" value="Data / API flow"
+          style="endArrow=block;endFill=1;html=1;fontSize=9;strokeColor=#0078D4;strokeWidth=2;"
+          edge="1" parent="1">
+          <mxGeometry x="1320" y="640" width="100" as="geometry">
+            <mxPoint x="1320" y="645" as="sourcePoint" />
+            <mxPoint x="1420" y="645" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend-private" value="Private network (VNet)"
+          style="endArrow=block;endFill=1;strokeColor=#008272;html=1;fontSize=9;strokeWidth=2;"
+          edge="1" parent="1">
+          <mxGeometry x="1320" y="670" width="100" as="geometry">
+            <mxPoint x="1320" y="675" as="sourcePoint" />
+            <mxPoint x="1420" y="675" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend-ai" value="AI client traffic"
+          style="endArrow=block;endFill=1;strokeColor=#FF8C00;html=1;fontSize=9;strokeWidth=2;"
+          edge="1" parent="1">
+          <mxGeometry x="1320" y="700" width="100" as="geometry">
+            <mxPoint x="1320" y="705" as="sourcePoint" />
+            <mxPoint x="1420" y="705" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="legend-obs2" value="Telemetry / observability"
+          style="endArrow=block;endFill=1;dashed=1;html=1;fontSize=9;strokeColor=#107C10;"
+          edge="1" parent="1">
+          <mxGeometry x="1320" y="730" width="100" as="geometry">
+            <mxPoint x="1320" y="735" as="sourcePoint" />
+            <mxPoint x="1420" y="735" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

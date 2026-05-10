@@ -1,0 +1,185 @@
+# ============================================================
+#  Azure AI Foundry — APIM Gateway Test Suite
+#  VS Code extension: REST Client (humao.rest-client)
+#
+#  Setup:
+#    1. Deploy your APIM and AI Foundry resources in Azure
+#    2. Retrieve an APIM subscription key (see docs/ReadME.md)
+#    3. Paste the key into @subscriptionKey below
+#    4. Click "Send Request" above any ### block
+# ============================================================
+
+@apimBaseUrl    = https://<your-apim-name>.azure-api.net
+@apiVersion     = 2025-01-01-preview
+@subscriptionKey = <your-apim-subscription-key>
+
+# ── Deployment names (match your Foundry deployments) ────────────────────────
+@deployment1 = gpt-5.4-mini-01
+@deployment2 = Kimi-K2.6-1
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 1 — gpt-5.4-mini-01 : basic chat completion
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment1}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant. Reply in one concise sentence."
+    },
+    {
+      "role": "user",
+      "content": "What is Azure API Management and why would you use it for AI models?"
+    }
+  ],
+  "max_tokens": 150,
+  "temperature": 0.7
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 2 — Kimi-K2.6-1 : basic chat completion
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment2}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant. Reply in one concise sentence."
+    },
+    {
+      "role": "user",
+      "content": "What is observability in cloud systems?"
+    }
+  ],
+  "max_tokens": 150,
+  "temperature": 0.7
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 3 — Check x-token-remaining header
+#  Look at the response headers — APIM injects x-token-remaining
+#  showing how many tokens are left in your per-minute quota.
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment1}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello. How many tokens do I have left in my quota?"
+    }
+  ],
+  "max_tokens": 50,
+  "temperature": 0
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 4 — Multi-turn conversation (gpt-5.4-mini-01)
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment1}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a concise assistant."
+    },
+    {
+      "role": "user",
+      "content": "What is a private endpoint in Azure?"
+    },
+    {
+      "role": "assistant",
+      "content": "A private endpoint is a network interface that uses a private IP from your VNet to connect to an Azure service privately, without going through the public internet."
+    },
+    {
+      "role": "user",
+      "content": "How does this help with APIM and Foundry?"
+    }
+  ],
+  "max_tokens": 200,
+  "temperature": 0.5
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 5 — Trigger rate limit (run rapidly to hit 100 req/60s)
+#  Expected response: HTTP 429 Too Many Requests
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment1}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "ping"
+    }
+  ],
+  "max_tokens": 5
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 6 — Missing subscription key
+#  Expected response: HTTP 401 Unauthorized
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/{{deployment1}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "This should fail with 401."
+    }
+  ],
+  "max_tokens": 10
+}
+
+
+# ════════════════════════════════════════════════════════════
+#  Test 7 — Non-existent deployment (should return 404 from Foundry)
+# ════════════════════════════════════════════════════════════
+### Send Request
+
+POST {{apimBaseUrl}}/openai/deployments/nonexistent-model/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{subscriptionKey}}
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "This should return a 404 or 400 from Foundry."
+    }
+  ],
+  "max_tokens": 10
+}

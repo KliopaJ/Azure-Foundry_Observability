@@ -1,0 +1,225 @@
+================================================================================
+  FOUNDRY OBSERVABILITY — SOLUTION OVERVIEW
+================================================================================
+
+WHAT IS IT?
+-----------
+Foundry Observability is a self-hosted governance and observability platform for
+Azure AI Foundry / Azure OpenAI deployments. It provides engineering teams and
+platform owners with real-time visibility into AI model consumption, per-user
+and per-group quota enforcement, cost tracking, and policy management — all from
+a single dashboard backed by a secure API gateway.
+
+The solution fills a gap in the native Azure AI Foundry experience: while Azure
+provides aggregate metrics, it does not offer per-consumer dashboards, built-in
+cost attribution per team, or a single interface to enforce and tune per-user
+rate limits dynamically.
+
+
+CHALLENGES IT SOLVES
+--------------------
+1. Visibility gap
+   Azure AI Foundry has no built-in per-user or per-team token consumption view.
+   Platform owners cannot easily answer "who is consuming how many tokens" or
+   "which model costs the most this week."
+
+2. Cost control before quota exhaustion
+   There is no native mechanism to enforce per-subscription budget limits that
+   stop or warn users before they hit subscription-level Azure quotas. Without
+   this, a single runaway workload can starve all other consumers.
+
+3. Multi-model governance at scale
+   Multiple models (gpt-4.1-mini, Kimi-K2.6, etc.) may be deployed across the
+   same Foundry resource. Governing access, rate limits, and policy per model —
+   all from one place — requires a gateway layer.
+
+4. Secure key-free access to Foundry
+   Distributing API keys directly to consumers is a security anti-pattern. A
+   centralized API gateway (APIM) issues per-user subscription keys, applies
+   rate limits, and proxies requests so Foundry credentials never leave the
+   backend.
+
+5. Network-level isolation for the AI backend
+   Publicly exposed AI endpoints are susceptible to direct attacks that bypass
+   gateway controls. The solution routes all backend traffic through a VNet
+   private endpoint, making the Foundry resource unreachable from the internet.
+
+6. Policy sprawl
+   APIM rate-limit policies are XML documents that are tedious to update
+   manually. The dashboard exposes a policy editor that applies TPM/request
+   quota changes directly to the APIM API policy via the ARM API.
+
+
+SOLUTION COMPONENTS
+-------------------
+
+FRONTEND — React SPA (TypeScript)
+  - Framework : Vite + React 18 + TypeScript
+  - UI        : TailwindCSS, Lucide icons
+  - Charts    : Recharts (area, bar, composed, pie charts)
+  - Auth      : MSAL.js v3 (OAuth2 Authorization Code + PKCE flow)
+  - Features  :
+      * Token consumption dashboard (hourly / daily / weekly / monthly)
+      * Per-deployment model usage table (input, output, total tokens, cost)
+      * Per-user and per-group usage breakdown via APIM subscription reports
+      * Cost & budget settings per user, group, and project
+      * Policy editor (live APIM policy XML update)
+      * Custom date range picker + preset windows (1D / 7D / 14D / 1M)
+
+BACKEND — FastAPI (Python)
+  - Runtime   : uvicorn (ASGI), served inside Docker container
+  - Serves    : React SPA static files + /api/* endpoints
+  - Routers   :
+      /api/config           — returns runtime config (clientId, tenantId, APIM)
+      /api/subscriptions    — lists Azure subscriptions visible to the user
+      /api/foundry-resources — lists CognitiveServices accounts
+      /api/projects         — lists AI Foundry projects under a resource
+      /api/deployments      — lists model deployments and model info
+      /api/metrics          — queries Azure Monitor for token metrics per
+                              deployment (InputTokens, OutputTokens,
+                              TotalTokens, ModelRequests)
+      /api/users-groups     — queries APIM subscription/request reports for
+                              per-user call counts and blocked request stats
+      /api/cost-limits      — reads/writes cost_limits.json (budget per user,
+                              group, project, monthly token caps)
+      /api/policy           — GET/PUT APIM API policy XML via ARM API
+  - All ARM calls are made with the user's Bearer token (user-delegated RBAC)
+
+AZURE API MANAGEMENT (APIM)
+  - SKU         : Developer (dev/test) or Premium (production multi-AZ)
+  - VNet mode   : External — gateway is internet-accessible; backend calls
+                  travel entirely within the VNet to the private endpoint
+  - API exposed : POST /openai/deployments/{deploymentId}/chat/completions
+  - Controls    :
+      * Rate limit per subscription (calls/minute, configurable via variables)
+      * Token-per-minute (TPM) quota per subscription (configurable)
+      * Per-user APIM subscriptions (peter-parker, tonny-stark, son-goku, etc.)
+      * Named Values for centralised config (api-version, TPM defaults)
+  - Observability:
+      * APIM Logger connected to Application Insights
+      * 100% sampling diagnostic capturing all headers and first 512 bytes of
+        request/response bodies
+      * Token quota headers (x-ratelimit-remaining-tokens) logged
+      * W3C HTTP correlation protocol for end-to-end trace linking
+
+AZURE AI FOUNDRY / AZURE OPENAI
+  - Provider    : Microsoft.CognitiveServices (kind: AIServices / OpenAI)
+  - Models      : gpt-4.1-mini (2025-04-14), Kimi-K2.6-1 (MaaS)
+  - Access      : Only reachable via private endpoint (no public network path
+                  from APIM to Foundry)
+
+AZURE APPLICATION INSIGHTS
+  - Workspace-based (linked to Log Analytics Workspace)
+  - Ingests all APIM diagnostic events (100% sampling, always-log-errors)
+  - Captures: request/response headers, token quota headers, client IP,
+              first 512 bytes of bodies, HTTP correlation IDs
+
+LOG ANALYTICS WORKSPACE
+  - Name       : law-foundry-observability
+  - SKU        : PerGB2018, 30-day retention
+  - Backend store for Application Insights telemetry and future DCR-based
+    log collection
+
+AZURE MONITOR
+  - Queried directly by the FastAPI backend via the REST metrics API
+  - Metrics namespace : microsoft.cognitiveservices/accounts
+  - Metrics collected : InputTokens, OutputTokens, TotalTokens, ModelRequests
+  - Filter            : per ModelDeploymentName dimension
+  - Aggregation       : Total, configurable interval (PT1H, P1D)
+
+NETWORKING
+  - VNet : vnet-foundry-observability (10.0.0.0/16)
+  - snet-apim (10.0.1.0/24) — APIM External VNet injection
+    NSG rules: Allow 443 (HTTPS), 80 (HTTP→HTTPS redirect), 3443 (APIM
+    management), 6390 (Azure LB health probe)
+  - snet-private-endpoints (10.0.2.0/24) — Private endpoint NIC
+  - Private Endpoint : NIC in snet-pe pointing to the Foundry resource
+  - Private DNS Zone : privatelink.openai.azure.com — resolves the Foundry
+    FQDN to the private IP, no URL change required
+
+AI CLIENT SCRIPTS (usage-simulation/)
+  - Simulated users: peter_parker, tonny_stark, son_goku, monkey_d_luffy
+  - simulate_to_budget.py — runs calls until a cost threshold is reached
+  - run_all.py — parallel simulation runner
+  - common.py — shared APIM call utilities
+
+DOCKER / CONTAINER
+  - Dockerfile    : multi-stage build; frontend compiled with npm then copied
+                    into backend/static; uvicorn starts on port 8004
+  - docker-compose: single service, env file for runtime config
+
+
+SECURITY DESIGN
+---------------
+
+AUTHENTICATION
+  The React SPA uses MSAL.js with the OAuth2 Authorization Code + PKCE flow.
+  No client secret is involved. The app never sees the user's password. Upon
+  successful login, Microsoft Entra ID issues a short-lived JWT access token
+  scoped to Azure Resource Manager (https://management.azure.com/
+  user_impersonation). The token is stored only in browser SessionStorage
+  (not localStorage, never a cookie).
+
+  App registration is a single-tenant SPA with only the SPA redirect URIs set
+  (no implicit flow, no client credentials).
+
+AUTHORIZATION (RBAC)
+  The backend acts as a transparent proxy. Every ARM API call is made using the
+  user's own Bearer token forwarded from the browser. This means Azure RBAC is
+  automatically enforced: a user who lacks Reader access to a subscription
+  cannot retrieve its resources, and a user who lacks APIM Contributor access
+  cannot update policies. The backend never escalates privileges.
+
+  APIM Managed Identity is assigned the minimum required role on the Foundry
+  resource to authenticate backend requests from APIM to Foundry via Azure AD
+  token-based auth (no stored API keys).
+
+NETWORK ISOLATION
+  Azure AI Foundry is not reachable from the public internet via APIM. APIM is
+  injected into the VNet (External mode), and all backend calls route through
+  the private endpoint in snet-private-endpoints. The Private DNS Zone resolves
+  the Foundry FQDN to a 10.x address, ensuring TLS certificate validation
+  succeeds against the original hostname while traffic stays private.
+
+GATEWAY CONTROLS
+  Every AI consumer is issued an individual APIM subscription key. APIM enforces
+  rate limits (calls/minute) and token-per-minute (TPM) quotas per subscription,
+  returning HTTP 429 before the request reaches Foundry. This prevents a single
+  consumer from exhausting the shared Foundry deployment capacity.
+
+SECRET MANAGEMENT
+  No secrets are hard-coded. Runtime configuration (tenantId, clientId, APIM
+  names) is injected via environment variables at container start. The cost
+  limits JSON file is the only state stored server-side, and it contains no
+  credentials. APIM subscription keys are managed entirely within APIM.
+
+NSG HARDENING
+  The APIM subnet NSG allows only the minimum required inbound rules:
+  port 443 (HTTPS clients), port 80 (redirect), port 3443 (Azure management
+  plane), and port 6390 (Azure Load Balancer health probes). All other inbound
+  traffic is denied by the default deny-all rule.
+
+
+DATA FLOW SUMMARY
+-----------------
+
+  1. User opens browser → React SPA loads
+  2. MSAL.js popup/redirect → Entra ID issues JWT (ARM scope)
+  3. SPA sends ARM token to FastAPI /api/config to fetch runtime config
+  4. Dashboard queries:
+       a. /api/metrics  → FastAPI → Azure Monitor (token usage by deployment)
+       b. /api/users-groups → FastAPI → APIM ARM reports (per-user stats)
+       c. /api/deployments → FastAPI → ARM CogSvc API (model list)
+  5. AI Client → HTTPS POST to APIM gateway with APIM subscription key
+  6. APIM checks rate limit & quota → routes request via VNet to Private
+     Endpoint → Azure AI Foundry processes inference → response returned
+  7. APIM Logger captures all traffic → Application Insights → Log Analytics
+  8. Admin can update APIM policy (TPM limits) via Settings page →
+     FastAPI /api/policy → ARM APIM Policy PUT
+  9. Admin can set cost budgets via Settings → FastAPI /api/cost-limits →
+     cost_limits.json (persisted server-side)
+
+
+================================================================================
+  END OF SOLUTION OVERVIEW
+================================================================================
