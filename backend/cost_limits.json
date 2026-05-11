@@ -11,23 +11,11 @@
   },
   "groupMonthlyTokens": {},
   "depLimitConfigs": {
-    "DeepSeek-V3.2": {
-      "type": "tpm",
-      "value": 10000
-    },
     "Kimi-K2.5": {
       "type": "tpm",
       "value": 10000
     },
-    "Llama-4-Maverick-17B-128E-Instruct-FP8": {
-      "type": "tpm",
-      "value": 10000
-    },
-    "gpt-5.3-codex": {
-      "type": "tpm",
-      "value": 10000
-    },
-    "gpt-5.4-mini": {
+    "Phi-4-reasoning": {
       "type": "tpm",
       "value": 10000
     }
