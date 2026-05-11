@@ -6,6 +6,8 @@ Single binary (Docker) — serves the React SPA and FastAPI backend on one port.
 
 [![Watch the video](assets/foundryobservability-demo-frontpage.png)](https://youtu.be/UvkwRza1qUE)
 
+💡 Note: press the image to see the video
+
 ---
 ## Architecture: 
 ![Architecture](assets/architecture-flow-with-roles.png)
