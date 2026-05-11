@@ -4,7 +4,7 @@ A real-time, multi-tenant observability platform for **Azure AI Foundry** — mo
 
 Single binary (Docker) — serves the React SPA and FastAPI backend on one port.
 
-![Architecture](assets/architecture.png)
+![Architecture](assets/architecture-flow-with-roles.png)
 
 ---
 
